@@ -1,0 +1,367 @@
+asyncapi: '2.6.0'
+info:
+  title: Instatus Webhooks
+  version: '1.0.0'
+  description: |
+    AsyncAPI specification for the Instatus webhook surface. Instatus delivers
+    HTTP POST callbacks to subscriber-configured endpoints for incident
+    lifecycle events, scheduled maintenance lifecycle events, and component
+    status changes on a status page.
+
+    Each request is signed with an `x-instatus-webhook-signature` header
+    containing the HMAC-SHA256 digest of the raw JSON body using the
+    configured webhook secret. Subscribers should verify this signature
+    before processing the payload.
+  contact:
+    name: Instatus
+    url: https://instatus.com/help/webhooks
+  license:
+    name: Proprietary
+    url: https://instatus.com/legal/terms
+
+defaultContentType: application/json
+
+servers:
+  subscriber:
+    url: '{webhookUrl}'
+    protocol: https
+    description: |
+      Subscriber-controlled HTTPS endpoint configured in the Instatus
+      status page notification settings. Instatus is the producer; the
+      subscriber's URL receives POST requests.
+    variables:
+      webhookUrl:
+        description: Full HTTPS URL provided by the subscriber.
+        default: https://example.com/webhooks/instatus
+
+channels:
+  incident:
+    description: |
+      Delivered when an incident is created or updated on the status page.
+      Covers the full incident lifecycle, including state transitions
+      across INVESTIGATING, IDENTIFIED, MONITORING, and RESOLVED.
+    subscribe:
+      operationId: receiveIncidentEvent
+      summary: Receive an incident lifecycle event.
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: '0.3.0'
+      message:
+        $ref: '#/components/messages/IncidentEvent'
+
+  maintenance:
+    description: |
+      Delivered when a scheduled maintenance is created or updated. Covers
+      lifecycle state transitions across NOTSTARTEDYET, INPROGRESS, and
+      COMPLETED.
+    subscribe:
+      operationId: receiveMaintenanceEvent
+      summary: Receive a maintenance lifecycle event.
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: '0.3.0'
+      message:
+        $ref: '#/components/messages/MaintenanceEvent'
+
+  component:
+    description: |
+      Delivered when a component status changes. Includes the previous
+      and new status alongside the component record.
+    subscribe:
+      operationId: receiveComponentEvent
+      summary: Receive a component status change event.
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: '0.3.0'
+      message:
+        $ref: '#/components/messages/ComponentEvent'
+
+components:
+  messages:
+    IncidentEvent:
+      name: IncidentEvent
+      title: Incident lifecycle event
+      summary: Fired when an incident is added or updated.
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/WebhookHeaders'
+      payload:
+        $ref: '#/components/schemas/IncidentPayload'
+
+    MaintenanceEvent:
+      name: MaintenanceEvent
+      title: Maintenance lifecycle event
+      summary: Fired when a scheduled maintenance is added or updated.
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/WebhookHeaders'
+      payload:
+        $ref: '#/components/schemas/MaintenancePayload'
+
+    ComponentEvent:
+      name: ComponentEvent
+      title: Component status change event
+      summary: Fired when a component's status changes.
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/WebhookHeaders'
+      payload:
+        $ref: '#/components/schemas/ComponentPayload'
+
+  schemas:
+    WebhookHeaders:
+      type: object
+      properties:
+        x-instatus-webhook-signature:
+          type: string
+          description: |
+            HMAC-SHA256 signature of the raw JSON body computed with the
+            subscriber's webhook secret. Used to verify authenticity and
+            detect payload tampering.
+        Content-Type:
+          type: string
+          enum:
+            - application/json
+      required:
+        - x-instatus-webhook-signature
+        - Content-Type
+
+    Meta:
+      type: object
+      description: Common metadata included on every webhook payload.
+      properties:
+        unsubscribe:
+          type: string
+          format: uri
+          description: URL the subscriber can use to unsubscribe.
+        documentation:
+          type: string
+          format: uri
+          description: Link to the webhook format documentation.
+
+    Page:
+      type: object
+      description: Status page summary included on every webhook payload.
+      properties:
+        id:
+          type: string
+          description: Unique status page identifier.
+        status_indicator:
+          type: string
+          description: Page-level status indicator.
+          enum:
+            - UP
+            - HASISSUES
+            - UNDERMAINTENANCE
+        status_description:
+          type: string
+          description: Human-readable description of the current page status.
+        url:
+          type: string
+          format: uri
+          description: Public URL of the status page.
+
+    IncidentStatus:
+      type: string
+      description: Incident lifecycle status.
+      enum:
+        - INVESTIGATING
+        - IDENTIFIED
+        - MONITORING
+        - RESOLVED
+
+    MaintenanceStatus:
+      type: string
+      description: Maintenance lifecycle status.
+      enum:
+        - NOTSTARTEDYET
+        - INPROGRESS
+        - COMPLETED
+
+    ComponentStatus:
+      type: string
+      description: Component operational status.
+      enum:
+        - OPERATIONAL
+        - UNDERMAINTENANCE
+        - DEGRADEDPERFORMANCE
+        - PARTIALOUTAGE
+        - MAJOROUTAGE
+
+    IncidentUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        incident_id:
+          type: string
+        body:
+          type: string
+          description: Update body text shared with subscribers.
+        status:
+          $ref: '#/components/schemas/IncidentStatus'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Incident:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        status:
+          $ref: '#/components/schemas/IncidentStatus'
+        impact:
+          type: string
+          description: Impact level of the incident.
+        backfilled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        incident_updates:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentUpdate'
+
+    MaintenanceUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        maintenance_id:
+          type: string
+        body:
+          type: string
+        status:
+          $ref: '#/components/schemas/MaintenanceStatus'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Maintenance:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        status:
+          $ref: '#/components/schemas/MaintenanceStatus'
+        impact:
+          type: string
+        backfilled:
+          type: boolean
+        duration:
+          type: string
+          description: Planned maintenance window duration.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        maintenance_updates:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaintenanceUpdate'
+
+    Component:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ComponentStatus'
+        created_at:
+          type: string
+          format: date-time
+
+    ComponentUpdate:
+      type: object
+      properties:
+        component_id:
+          type: string
+        new_status:
+          $ref: '#/components/schemas/ComponentStatus'
+        created_at:
+          type: string
+          format: date-time
+
+    IncidentPayload:
+      type: object
+      required:
+        - meta
+        - page
+        - incident
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        page:
+          $ref: '#/components/schemas/Page'
+        incident:
+          $ref: '#/components/schemas/Incident'
+
+    MaintenancePayload:
+      type: object
+      required:
+        - meta
+        - page
+        - maintenance
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        page:
+          $ref: '#/components/schemas/Page'
+        maintenance:
+          $ref: '#/components/schemas/Maintenance'
+
+    ComponentPayload:
+      type: object
+      required:
+        - meta
+        - page
+        - component_update
+        - component
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        page:
+          $ref: '#/components/schemas/Page'
+        component_update:
+          $ref: '#/components/schemas/ComponentUpdate'
+        component:
+          $ref: '#/components/schemas/Component'

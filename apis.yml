@@ -4,7 +4,7 @@ description: "Post to and update maintenance and incidents on your status page t
 url: https://instatus.com/help/api
 specificationVersion: '0.20'
 created: '2026-05-28'
-modified: '2026-05-28'
+modified: '2026-05-30'
 x-source: public-apis/public-apis
 x-category: "Business"
 x-tier: 3
@@ -22,6 +22,10 @@ apis:
     properties:
       - type: Documentation
         url: https://instatus.com/help/api
+      - type: Documentation
+        url: https://instatus.com/help/webhooks
+      - type: AsyncAPI
+        url: webhooks-asyncapi.yml
 common:
   - type: Website
     url: https://instatus.com/help/api
