@@ -27,10 +27,14 @@ apis:
       - type: AsyncAPI
         url: webhooks-asyncapi.yml
 common:
+  - type: DomainSecurity
+    url: security/instatus-domain-security.yml
   - type: Website
     url: https://instatus.com/help/api
   - type: PublicAPIsListing
     url: https://github.com/public-apis/public-apis
+  - url: https://instatus.com/blog
+    type: Blog
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
