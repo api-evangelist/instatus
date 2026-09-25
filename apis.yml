@@ -50,6 +50,8 @@ apis:
       - type: AsyncAPI
         url: webhooks-asyncapi.yml
 common:
+  - type: VendorFacets
+    url: vendor-facets/instatus-vendor-facets.yml
   - type: DomainSecurity
     url: security/instatus-domain-security.yml
   - type: Website
