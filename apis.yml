@@ -39,7 +39,6 @@ apis:
   - name: Instatus
     description: "Post to and update maintenance and incidents on your status page through an HTTP REST API"
     humanURL: https://instatus.com/help/api
-    baseURL: https://instatus.com/help/api
     tags:
       - Business
     properties:
