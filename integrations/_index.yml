@@ -56,7 +56,7 @@
     - alpha
     in_cloud: true
     builder: unknown (community connector; contributor not in the record)
-  status: pending-partner-spec
+  status: not-a-workflow
   arazzo: null
 - slug: instatus-google-workspace-own
   label: Google Workspace (own)
