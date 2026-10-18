@@ -28,3 +28,59 @@
     builder: unknown (not in the directory record)
   status: not-a-workflow
   arazzo: null
+- slug: instatus-airbyte
+  label: Airbyte
+  partner: airbyte
+  partner_name: Airbyte
+  type: marketplace
+  marketplace: airbyte-registry
+  channel: elt-connector
+  evidence: https://docs.airbyte.com/integrations/sources/instatus
+  source: edge
+  relationship: ipaas-bridge
+  contract_reference:
+    register: Airbyte connector registry (connectors.airbyte.com cloud_registry.json + oss_registry.json)
+    spec_file: null
+    role: elt-connector:airbyte-community
+    registered_name: Instatus
+    matched_domain: instatus.com
+    matched_by: domain
+    detected_by: sweep-data-integration.py
+    detected: '2026-10-18'
+    signal_note: one edge per (provider, platform); connectors, streams, packages and usage are context, never read
+    connectors:
+    - airbyte/source-instatus
+    support_level:
+    - community
+    release_stage:
+    - alpha
+    in_cloud: true
+    builder: unknown (community connector; contributor not in the record)
+  status: pending-partner-spec
+  arazzo: null
+- slug: instatus-google-workspace-own
+  label: Google Workspace (own)
+  partner: google-workspace
+  partner_name: Google Workspace (own)
+  category: Google Workspace app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://workspace.google.com/marketplace/app/instatus/732754506819
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
+- slug: instatus-slack-own
+  label: Slack (own)
+  partner: slack
+  partner_name: Slack (own)
+  category: Slack app
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://slack.com/marketplace/ATV6H0P8T-instatus
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
