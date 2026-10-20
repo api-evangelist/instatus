@@ -89,6 +89,23 @@ edges:
   detected: '2026-10-18'
   detected_by: mirror-platform-listings.py
   category: Slack app
+- partner_name: Zendesk (own)
+  partner: zendesk
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://www.zendesk.com/marketplace/apps/support/1207809/instatus/
+  mirror_of: zendesk/integrations/zendesk-integration-edges.yml
+  apps:
+  - Instatus
+  listing_count: 1
+  detected: '2026-10-20'
+  detected_by: mirror-platform-listings.py
+  category: Agent Productivity
 method: searched
 checked:
 - google-workspace/integrations/google-workspace-integration-edges.yml
@@ -96,5 +113,6 @@ checked:
 - https://connectors.airbyte.com/files/registries/v0/oss_registry.json
 - https://zapier.com/api/v4/apps/
 - slack/integrations/slack-integration-edges.yml
+- zendesk/integrations/zendesk-integration-edges.yml
 source:
 - https://zapier.com/api/v4/apps/

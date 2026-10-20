@@ -84,3 +84,16 @@
   relationship: platform-app
   status: not-a-workflow
   arazzo: null
+- slug: instatus-zendesk-own
+  label: Zendesk (own)
+  partner: zendesk
+  partner_name: Zendesk (own)
+  category: Agent Productivity
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://www.zendesk.com/marketplace/apps/support/1207809/instatus/
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
